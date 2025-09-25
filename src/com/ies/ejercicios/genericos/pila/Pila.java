@@ -1,4 +1,6 @@
-package com.ies.ejercicios.genericos;
+package com.ies.ejercicios.genericos.pila;
+
+import com.ies.ejercicios.genericos.ColeccionSimpleGenerica;
 
 import java.util.LinkedList;
 

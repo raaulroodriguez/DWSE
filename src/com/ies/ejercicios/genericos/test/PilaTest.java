@@ -1,6 +1,6 @@
 package com.ies.ejercicios.genericos.test;
 
-import com.ies.ejercicios.genericos.Pila;
+import com.ies.ejercicios.genericos.pila.Pila;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

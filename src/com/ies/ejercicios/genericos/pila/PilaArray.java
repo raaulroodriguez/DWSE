@@ -1,7 +1,6 @@
-package com.ies.ejercicios.genericos;
+package com.ies.ejercicios.genericos.pila;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
+import com.ies.ejercicios.genericos.ColeccionSimpleGenerica;
 
 public class PilaArray<T> implements ColeccionSimpleGenerica<T> {
 

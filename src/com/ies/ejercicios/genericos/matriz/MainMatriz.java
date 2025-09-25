@@ -1,4 +1,4 @@
-package com.ies.ejercicios.genericos;
+package com.ies.ejercicios.genericos.matriz;
 
 public class MainMatriz {
 
