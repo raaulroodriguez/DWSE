@@ -3,7 +3,7 @@ package com.ies.ejercicios.genericos;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListaOrdenada<E extends Comparable> {
+public class ListaOrdenada<E extends Comparable<E>> {
 
     public List<E> listaOrdenada;
 
@@ -12,7 +12,19 @@ public class ListaOrdenada<E extends Comparable> {
     }
 
     void add(E o) {
-        listaOrdenada.add(o);
+        if (listaOrdenada.isEmpty()) {
+            listaOrdenada.add(o);
+            return;
+        }
+        int posicion = 0;
+        for (int i = 0; i < listaOrdenada.size(); i++) {
+            if (o.compareTo(listaOrdenada.get(i)) <= 0) {
+                posicion = i;
+                break;
+            }
+            posicion = i + 1;
+        }
+        listaOrdenada.add(posicion, o);
     }
 
     E get(int index) {
