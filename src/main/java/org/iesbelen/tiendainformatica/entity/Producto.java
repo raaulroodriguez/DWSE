@@ -2,68 +2,85 @@ package org.iesbelen.tiendainformatica.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;
+
 
 @Entity
-@Table(name="PRODUCTOS")
-public class Producto implements java.io.Serializable {
+@Table(name="productos")
+public class Producto {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer idProducto;
-	@NotNull
-	private String nombre;
-	@NotNull
-	private double precio;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_producto")
+    private Integer idProducto;
 
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "idFabricante", nullable = false)
-	private Fabricante fabricante;
+    @NotEmpty // Mejor que @NotNull para Strings, asegura que no esté vacío ""
+    @Column(name = "nombre", nullable = false)
+    private String nombre;
+
+    @NotNull
+    @Positive // Asegura que el precio sea un valor positivo
+    @Column(name = "precio", nullable = false)
+    private double precio;
+
+    @ManyToOne(fetch = FetchType.LAZY) // Sugerencia: Usar LAZY para mejorar el rendimiento
+    @JoinColumn(name = "id_fabricante",
+            foreignKey = @ForeignKey(name = "FK_PRODUCTO_FABRICANTE"))
+    private Fabricante fabricante;
 
 
-	public Producto() {
-	}
+    public Producto() {
 
-	public Producto(Fabricante fabricante, String nombre, double precio) {
-		this.fabricante = fabricante;
-		this.nombre = nombre;
-		this.precio = precio;
-	}
+    }
 
-	public Integer getIdProducto() {
-		return this.idProducto;
-	}
+    // El constructor con parámetros es útil para crear nuevas instancias
+    public Producto(Fabricante fabricante, String nombre, double precio) {
+        this.fabricante = fabricante;
+        this.nombre = nombre;
+        this.precio = precio;
+    }
 
-	public void setIdProducto(Integer idProducto) {
-		this.idProducto = idProducto;
-	}
+    // Getters y Setters (sin cambios, están correctos)
+    public Integer getIdProducto() {
+        return this.idProducto;
+    }
 
-	public Fabricante getFabricante() {
-		return this.fabricante;
-	}
+    public void setIdProducto(Integer idProducto) {
+        this.idProducto = idProducto;
+    }
 
-	public void setFabricante(Fabricante fabricante) {
-		this.fabricante = fabricante;
-	}
+    public Fabricante getFabricante() {
+        return this.fabricante;
+    }
 
-	public String getNombre() {
-		return this.nombre;
-	}
+    public void setFabricante(Fabricante fabricante) {
+        this.fabricante = fabricante;
+    }
 
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
+    public String getNombre() {
+        return this.nombre;
+    }
 
-	public double getPrecio() {
-		return this.precio;
-	}
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
-	public void setPrecio(double precio) {
-		this.precio = precio;
-	}
-	
-	@Override
-	public String toString() {
-		return "Producto [idProducto=" + idProducto + ", fabricante=" + fabricante.getNombre() + ", nombre=" + nombre + ", precio=" + precio
-				+ "]";
-	}
+    public double getPrecio() {
+        return this.precio;
+    }
+
+    public void setPrecio(double precio) {
+        this.precio = precio;
+    }
+
+    @Override
+    public String toString() {
+        // Se comprueba si el fabricante está inicializado para evitar errores.
+        String nombreFabricante = (fabricante != null && Persistence.getPersistenceUtil().isLoaded(fabricante))
+                ? fabricante.getNombre()
+                : "[Fabricante no cargado]";
+        return "Producto [idProducto=" + idProducto + ", fabricante=" + nombreFabricante + ", nombre=" + nombre + ", precio=" + precio
+                + "]";
+    }
 }

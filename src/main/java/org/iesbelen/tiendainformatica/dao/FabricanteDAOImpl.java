@@ -1,70 +1,82 @@
 package org.iesbelen.tiendainformatica.dao;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 import org.iesbelen.tiendainformatica.entity.Fabricante;
-import org.iesbelen.tiendainformatica.util.JPAUtil;
 
 import java.util.List;
 
-public class FabricanteDAOImpl implements FabricanteDAO{
+public class FabricanteDAOImpl implements FabricanteDAO {
 
+    // El EntityManager es un atributo de la clase
+    private EntityManager em;
+
+    // Se inyecta a través del constructor
+    public FabricanteDAOImpl(EntityManager em) {
+        this.em = em;
+    }
+
+    // Los métodos de transacción ahora usan el EntityManager de la clase
     public void beginTransaction() {
-        EntityManager em = JPAUtil.getEntityManager();
         em.getTransaction().begin();
-        em.close();
     }
 
     public void commitTransaction() {
-        EntityManager em = JPAUtil.getEntityManager();
         em.getTransaction().commit();
-        em.close();
     }
 
     public void rollbackTransaction() {
-        EntityManager em = JPAUtil.getEntityManager();
         em.getTransaction().rollback();
-        em.close();
     }
 
     @Override
     public List<Fabricante> findAll() {
 
-        EntityManager em = JPAUtil.getEntityManager();
-        List<Fabricante> fabricantes =
-                em.createQuery("SELECT f FROM Fabricante f",Fabricante.class).getResultList();
-        em.close();
-
-        return fabricantes;
+        return em.createQuery("SELECT f FROM Fabricante f", Fabricante.class).getResultList();
     }
 
     @Override
     public Fabricante findOne(Long id) {
-        EntityManager em = JPAUtil.getEntityManager();
-        Fabricante fabricante = em.find(Fabricante.class,id);
-        em.close();
 
-        return fabricante;
+        return em.find(Fabricante.class, id);
     }
 
     @Override
     public boolean create(Fabricante fabricante) {
-        EntityManager em = JPAUtil.getEntityManager();
-        em.getTransaction().begin();
-        em.persist(fabricante);
-        em.getTransaction().commit();
-        em.close();
-        return true;
+
+        try {
+            em.persist(fabricante);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
     public boolean update(Fabricante fabricante) {
-        return false;
+        // Implementación correcta de update
+        try {
+            em.merge(fabricante);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
     public boolean delete(Long id) {
-        return false;
+        // Implementación correcta de delete
+        try {
+            Fabricante fabricante = findOne(id);
+            if (fabricante != null) {
+                em.remove(fabricante);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

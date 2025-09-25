@@ -1,70 +1,77 @@
 package org.iesbelen.tiendainformatica.dao;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 import org.iesbelen.tiendainformatica.entity.Producto;
-import org.iesbelen.tiendainformatica.util.JPAUtil;
 
 import java.util.List;
 
-public class ProductoDAOImpl implements ProductoDAO{
+public class ProductoDAOImpl implements ProductoDAO {
 
+    // El EntityManager es un atributo de la clase, inyectado por el constructor
+    private EntityManager em;
+
+    public ProductoDAOImpl(EntityManager em) {
+        this.em = em;
+    }
+
+    // Los métodos de transacción operan sobre el EntityManager de la clase
     public void beginTransaction() {
-        EntityManager em = JPAUtil.getEntityManager();
         em.getTransaction().begin();
-        em.close();
     }
 
     public void commitTransaction() {
-        EntityManager em = JPAUtil.getEntityManager();
         em.getTransaction().commit();
-        em.close();
     }
 
     public void rollbackTransaction() {
-        EntityManager em = JPAUtil.getEntityManager();
         em.getTransaction().rollback();
-        em.close();
     }
 
     @Override
     public List<Producto> findAll() {
-
-        EntityManager em = JPAUtil.getEntityManager();
-        List<Producto> productos =
-                em.createQuery("SELECT p FROM Producto p",Producto.class).getResultList();
-        em.close();
-
-        return productos;
+        return em.createQuery("SELECT p FROM Producto p", Producto.class).getResultList();
     }
 
     @Override
     public Producto findOne(Long id) {
-        EntityManager em = JPAUtil.getEntityManager();
-        Producto producto = em.find(Producto.class,id);
-        em.close();
-
-        return producto;
+        return em.find(Producto.class, id);
     }
 
     @Override
     public boolean create(Producto producto) {
-        EntityManager em = JPAUtil.getEntityManager();
-        em.getTransaction().begin();
-        em.persist(producto);
-        em.getTransaction().commit();
-        em.close();
-        return true;
+
+        try {
+            em.persist(producto);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
     public boolean update(Producto producto) {
-        return false;
+        try {
+            em.merge(producto);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
     public boolean delete(Long id) {
-        return false;
+        try {
+            Producto producto = findOne(id);
+            if (producto != null) {
+                em.remove(producto);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

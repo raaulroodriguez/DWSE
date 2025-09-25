@@ -1,71 +1,81 @@
 package org.iesbelen.tiendainformatica.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
 
 import java.util.HashSet;
 import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
-@Table(name="FABRICANTES")
-public class Fabricante implements java.io.Serializable {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer idFabricante;
-	@NotNull
-	private String nombre;
+@Table(name="fabricantes")
+public class Fabricante {
 
-	@OneToMany(mappedBy = "fabricante",fetch = FetchType.EAGER)
-	private Set<Producto> productos = new HashSet<>(0);
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_fabricante")
+    private Integer idFabricante;
 
-	public Fabricante() {
-	}
+    @NotEmpty // Mejor que @NotNull para Strings
+    @Column(name = "nombre", nullable = false, unique = true) // El nombre del fabricante debería ser único
+    private String nombre;
 
-	public Fabricante(String nombre) {
-		this.nombre = nombre;
-	}
+    @OneToMany(
+            mappedBy = "fabricante",
+            cascade = CascadeType.ALL, // Para que las operaciones (persist, remove) se propaguen a los productos
+            orphanRemoval = true,      // Para eliminar productos que se queden "huérfanos"
+            fetch = FetchType.LAZY     // Sugerencia: Usar LAZY para mejorar el rendimiento
+    )
+    @JsonIgnoreProperties("fabricante") // Evita la recursión infinita al serializar a JSON
+    private Set<Producto> productos = new HashSet<>(); // No es necesario inicializar con 0
 
-	public Fabricante(String nombre, Set<Producto> productos) {
-		this.nombre = nombre;
-		this.productos = productos;
-	}
 
-	public Integer getIdFabricante() {
-		return this.idFabricante;
-	}
+    public Fabricante() {
 
-	public void setIdFabricante(Integer idFabricante) {
-		this.idFabricante = idFabricante;
-	}
+    }
 
-	public String getNombre() {
-		return this.nombre;
-	}
+    public Fabricante(String nombre) {
+        this.nombre = nombre;
+    }
 
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
 
-	public void addProducto(Producto producto) {
-		productos.add(producto);
-		producto.setFabricante(this);
-	}
-	public void removeProducto(Producto producto) {
-		productos.remove(producto);
-		producto.setFabricante(null);
-	}
+    public Integer getIdFabricante() {
+        return this.idFabricante;
+    }
 
-	public Set<Producto> getProductos() {
-		return this.productos;
-	}
+    public void setIdFabricante(Integer idFabricante) {
+        this.idFabricante = idFabricante;
+    }
 
-	public void setProductos(Set<Producto> productos) {
-		this.productos = productos;
-	}
+    public String getNombre() {
+        return this.nombre;
+    }
 
-	@Override
-	public String toString() {
-		return "Fabricante [idFabricante=" + idFabricante + ", nombre=" + nombre + "]";
-	}
-	
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public Set<Producto> getProductos() {
+        return this.productos;
+    }
+
+    public void setProductos(Set<Producto> productos) {
+        this.productos = productos;
+    }
+
+
+    public void addProducto(Producto producto) {
+        this.productos.add(producto);
+        producto.setFabricante(this);
+    }
+
+    public void removeProducto(Producto producto) {
+        this.productos.remove(producto);
+        producto.setFabricante(null);
+    }
+
+    @Override
+    public String toString() {
+        return "Fabricante [idFabricante=" + idFabricante + ", nombre=" + nombre + "]";
+    }
 }
