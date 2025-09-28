@@ -3,6 +3,7 @@ package stream;
 import java.util.*;
 
 import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import org.iesbelen.tiendainformatica.dao.FabricanteDAO;
 import org.iesbelen.tiendainformatica.dao.ProductoDAO;
 import org.iesbelen.tiendainformatica.entity.Fabricante;
@@ -138,8 +139,10 @@ class TiendaTest {
 
         List<Producto> listProd = productosDAO.findAll();
 
-        // TODO STREAM
-
+        List<String> listaNombrePrecio = listProd.stream()
+                .map(prod -> prod.getNombre() + " - " + prod.getPrecio())
+                .toList();
+        listaNombrePrecio.forEach(System.out::println);
     }
 
 
@@ -148,8 +151,10 @@ class TiendaTest {
 
         List<Producto> listProd = productosDAO.findAll();
 
-        //TODO STREAMS
-
+        List<String> listaPrecioDolares = listProd.stream()
+                .map(prod -> prod.getNombre() + " - " + prod.getPrecio() + " - " + prod.getPrecio() * 1.17 + "$")
+                .toList();
+        listaPrecioDolares.forEach(System.out::println);
     }
 
 
@@ -158,8 +163,10 @@ class TiendaTest {
 
         List<Producto> listProd = productosDAO.findAll();
 
-        //TODO STREAMS
-
+        List<String> listaNombreMayuscula = listProd.stream()
+                .map(prod -> prod.getNombre().toUpperCase())
+                .toList();
+        listaNombreMayuscula.forEach(System.out::println);
     }
 
 
@@ -168,18 +175,21 @@ class TiendaTest {
 
         List<Fabricante> listFab = fabricantesDAO.findAll();
 
-        //TODO STREAMS
-
+        List<String> listaDosPrimerosMayuscula = listFab.stream()
+                .map(fabricante -> fabricante.getNombre() + " - " + fabricante.getNombre().substring(0,2).toUpperCase())
+                .toList();
+        listaDosPrimerosMayuscula.forEach(System.out::println);
     }
 
 
     @Test
     void test5() {
-
         List<Fabricante> listFab = fabricantesDAO.findAll();
 
-        //TODO STREAMS
-
+        listFab.stream()
+                .filter(f -> f.getProductos() != null && !f.getProductos().isEmpty())
+                .map(Fabricante::getIdFabricante)
+                .forEach(System.out::println);
     }
 
 
@@ -188,7 +198,10 @@ class TiendaTest {
 
         List<Fabricante> listFab = fabricantesDAO.findAll();
 
-        //TODO STREAMS
+        listFab.stream()
+                .sorted(Comparator.comparing(Fabricante::getNombre).reversed())
+                .map(Fabricante::getNombre)
+                .forEach(System.out::println);
 
     }
 
@@ -198,8 +211,10 @@ class TiendaTest {
 
         List<Producto> listProd = productosDAO.findAll();
 
-        //TODO STREAMS
-
+        listProd.stream()
+                .sorted(Comparator.comparing(Producto::getNombre).thenComparing(Producto::getPrecio, Comparator.reverseOrder()))
+                .map(producto -> producto.getNombre() + " - " + producto.getPrecio())
+                .forEach(System.out::println);
     }
 
 
@@ -208,8 +223,10 @@ class TiendaTest {
 
         List<Fabricante> listFab = fabricantesDAO.findAll();
 
-        //TODO STREAMS
-
+        listFab.stream()
+                .map(Fabricante::getNombre)
+                .limit(5)
+                .forEach(System.out::println);
     }
 
 
@@ -218,17 +235,22 @@ class TiendaTest {
 
         List<Fabricante> listFab = fabricantesDAO.findAll();
 
-        //TODO STREAMS
+        listFab.stream()
+                .map(Fabricante::getNombre)
+                .skip(3)
+                .limit(2)
+                .forEach(System.out::println);
     }
 
 
     @Test
     void test10() {
-
         List<Producto> listProd = productosDAO.findAll();
 
-        //TODO STREAMS
-
+        listProd.stream()
+                .min(Comparator.comparing(Producto::getPrecio))
+                .map(producto -> producto.getNombre() + " - " + producto.getPrecio())
+                .ifPresent(System.out::println);
     }
 
 
@@ -237,8 +259,10 @@ class TiendaTest {
 
         List<Producto> listProd = productosDAO.findAll();
 
-        //TODO STREAMS
-
+        listProd.stream()
+                .max(Comparator.comparing(Producto::getPrecio))
+                .map(producto -> producto.getNombre() + " - " + producto.getPrecio())
+                .ifPresent(System.out::println);
     }
 
 
@@ -247,8 +271,10 @@ class TiendaTest {
 
         List<Producto> listProd = productosDAO.findAll();
 
-        //TODO STREAMS
-
+        listProd.stream()
+                .filter(p -> p.getFabricante().getIdFabricante().equals(2))
+                .map(Producto::getNombre)
+                .forEach(System.out::println);
     }
 
 
